@@ -1,0 +1,17 @@
+apisix_addr: 127.0.0.1:80 ## 网关地址
+name: "wjx_webhook" ## 服务名 关联docker-compose  sample1,sample2,sample3....
+id: 18 ## 服务ID（自定义一个未被网关使用的ID）
+init_cmd: docker-compose up -d ## 初始化服务命令
+start_cmd: docker-compose start
+restart_cmd: docker-compose restart wjx_webhook
+update_cmd: "docker-compose restart wjx_webhook" ## 更新命令 (依次执行 'docker-compose restart sample1', 'docker-compose restart sample2', ...)
+stop_cmd: docker-compose stop ## 可以不填
+show_http_resp: false ## 是否显示http回复内容
+route:
+  desc: "wjx_webhook 路由监听" ## 路由描述
+  uris: ## 路由转发 至少一个
+    - /wjx/*
+upstream:
+  desc: "wjx_webhook upstreams" ## upstream描述
+  nodes: ## 服务节点 weight表示负载权重  顺序和docker-compose服务一致
+    - { addr: 127.0.0.1:9676, weight: 1 }
