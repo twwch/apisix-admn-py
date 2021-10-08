@@ -20,8 +20,7 @@ except ImportError:
     sentry = None
 
 routes = [
-    # hr调查表hook
-    (r"/apisix_admin/state", StateHandler),
+    (r"/apisix_admin/v1/state", StateHandler),
     (r"/apisix_admin/v1/organization/user/login", LoginHandler),
     (r"/apisix_admin/v1/organization/user/info", UserInfoHandler),
     (r"/apisix_admin/v1/apisix/route/list", apisix.RouteHandler),
@@ -34,7 +33,7 @@ if __name__ == "__main__":
     [print(i[0]) for i in routes]
 
     parser = ArgumentParser()
-    parser.add_argument("--port", default=9676, type=int, help="listen port")
+    parser.add_argument("--port", default=9913, type=int, help="listen port")
     parser.add_argument("--numprocs", default=0, type=int, help="number of sub-process to fork")
     options, _ = parser.parse_known_args()
 
@@ -48,6 +47,7 @@ if __name__ == "__main__":
         print('server.listen({})'.format(port))
         server.listen(port)
     else:
+        print('server.listen({})'.format(port))
         server.bind(port)
         server.start(num_procs)
     IOLoop.current().start()

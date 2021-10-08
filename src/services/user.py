@@ -7,7 +7,7 @@ from utils.jwt_util import get_token, check_token
 
 def get_user(account):
     account = fill_login_name(account)
-    return dict(UserModel().find_one({"$or": [{"mobile": account}, {"email": account}], "active": True}))
+    return dict(UserModel().find_one({"$or": [{"mobile": account}, {"email": account}]}))
 
 
 def login(account, password):

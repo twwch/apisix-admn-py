@@ -11,15 +11,20 @@ def route_list_or_get(data: dict):
     if not id:
         routes = apisix_sdk.route_list()
         if routes:
-            return CODE_OK, routes
+            data = {
+                "routes": routes,
+                "total": len(routes)
+            }
+            return CODE_OK, data
         return CODE_SYSTEM_ERROR, None
     route = apisix_sdk.get_route(id)
     upstream = apisix_sdk.get_upstream(id)
     if route and upstream:
+        nodes = upstream.get("value", {}).get("nodes") or {}
         resp = {
-            "route": route,
-            "upstream": upstream,
-            "nodes": list()
+            "route": route.get("value", {}),
+            "upstream": upstream.get("value", {}),
+            "nodes": [{"node_key": key, "node_value": value} for key, value in nodes.items()]
         }
         return CODE_OK, resp
     else:
@@ -30,7 +35,11 @@ def route_create(data: dict):
     route = data.get("route")
     upstream = data.get("upstream")
     id = str(int(time.time()))
-    create_upstream = apisix_sdk.route_create(id, upstream)
+    if data.get("id"):
+        id = data.get("id")
+    if upstream.get("name"):
+        del upstream["name"]
+    create_upstream = apisix_sdk.upstream_create(id, upstream)
     if not create_upstream:
         return CODE_CREATE_UPSTREAM_ERROR, None
     create_route = apisix_sdk.route_create(id, route)
@@ -41,7 +50,11 @@ def route_create(data: dict):
 
 
 def upstream_list():
-    upstreams = apisix_sdk.get_upstream(id)
+    upstreams = apisix_sdk.upstream_list()
     if upstreams:
-        return CODE_OK, upstreams
+        data = {
+            "upstreams": upstreams,
+            "total": len(upstreams)
+        }
+        return CODE_OK, data
     return CODE_SYSTEM_ERROR, None
